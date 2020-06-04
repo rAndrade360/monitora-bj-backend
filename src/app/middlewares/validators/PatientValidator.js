@@ -1,5 +1,6 @@
 const { check } = require('express-validator');
 const Patient = require('../../models/Patient');
+const cpf_vaidator = require('cpf-cnpj-validator');
 const generateHashedPassword = require('../../utils/generateHashedPassword');
 
 const common = [
@@ -42,9 +43,7 @@ const common = [
 
     check('patient.birthday')
         .notEmpty()
-        .toDate(),
-
-    
+        .toDate(),    
 
     check('patient.risk')
         .notEmpty()
@@ -80,7 +79,7 @@ const store = [
         .withMessage('Invalid cpf')
         .custom(async (cpf) => {
             const existsPatient = await Patient.verifyIfAlreadExists(cpf)
-            if (existsPatient) throw new Error('Patient already exists')
+            if (existsPatient || !cpf_vaidator.cpf.isValid(cpf) ) throw new Error('Patient already exists')
         }),
 
     check('patient.password')
@@ -114,7 +113,13 @@ const login = [
     check('cpf')
         .notEmpty()
         .isNumeric()
-        .isLength({ min: 8 }),
+        .isLength({ min: 8 })
+        .custom((cpf) => {
+            if(!cpf_vaidator.cpf.isValid(cpf)) {
+                throw new Error('This cpf not exists')
+            }
+        }),
+
 
     check('password')
         .notEmpty()
