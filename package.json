@@ -1,0 +1,39 @@
+{
+  "name": "monitora-bj",
+  "version": "1.0.0",
+  "description": "Uma plataforma para monitoramento dos casos em triagem na cidade de Bom Jardim - MA",
+  "main": "index.js",
+  "author": "Renan de Andrade Correa",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node src/server",
+    "dev": "nodemon src/server",
+    "test": "jest"
+  },
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "cors": "^2.8.5",
+    "date-fns": "^2.14.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-brute": "^1.0.1",
+    "express-brute-redis": "^0.0.1",
+    "express-rate-limit": "^5.1.3",
+    "express-validator": "^6.5.0",
+    "helmet": "^3.22.0",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.21.1",
+    "rate-limit-redis": "^2.0.0",
+    "redis": "^3.0.2",
+    "socket.io": "^2.3.0",
+    "sqlite3": "^4.2.0"
+  },
+  "devDependencies": {
+    "faker": "^4.1.0",
+    "faker-br": "^0.2.4",
+    "jest": "^26.0.1",
+    "nodemon": "^2.0.4",
+    "supertest": "^4.0.2"
+  }
+}
