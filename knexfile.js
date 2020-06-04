@@ -36,6 +36,8 @@ module.exports = {
   production: {
     client: process.env.DBCLIENT,
     connection: {
+      host: process.env.DBHOST,
+      port: process.env.DBPORT,
       database:  process.env.DATABASE,
       user: process.env.DBUSERNAME,
       password: process.env.DBPASSWORD
@@ -45,7 +47,11 @@ module.exports = {
       max: 10
     },
     migrations: {
-      tableName: 'knex_migrations'
+      tableName: 'knex_migrations',
+      directory: path.resolve(__dirname, 'src', 'database', 'migrations')
+    },
+    seeds: {
+      directory: path.resolve(__dirname, 'src', 'database', 'seeds')
     }
   }
 

@@ -18,7 +18,8 @@ if (process.env.NODE_ENV !== 'development'){
     store: new RateLimitRedis({
       client: redis.createClient({
         host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT
+        port: process.env.REDIS_PORT,
+        password: process.env.REDIS_PASSWORD
       })
     }),
     windowMs: 1000 * 60 * 10,
