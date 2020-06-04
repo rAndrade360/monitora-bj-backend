@@ -1,6 +1,6 @@
 const routes = require('express').Router();
-const Brute = require('express-brute');
-const BruteRedis = require('express-brute-redis');
+const ExpressBruteFlexible = require('rate-limiter-flexible/lib/ExpressBruteFlexible');
+const redis = require('redis');
 
 const PatientController = require('./app/controllers/PatientController');
 const AuthController = require('./app/controllers/AuthController');
@@ -14,12 +14,23 @@ const PatientUpdateValidator = require('./app/middlewares/validators/PatientUpda
 const DailyReportValidator = require('./app/middlewares/validators/DailyReportValidator');
 const tokenValidator = require('./app/middlewares/auth/tokenValidator');
 
-const store = new BruteRedis({
+const store = redis.createClient({
   host: process.env.REDIS_HOST,
   port: process.env.REDIS_PORT
 });
 
-const bruteforce = new Brute(store);
+const opts = {
+  freeRetries: 5,
+  minWait: 1000, // 1 second
+  maxWait: 30000, // 10 seconds
+  lifetime: 60, // 30 seconds
+  storeClient: store,
+};
+
+const bruteforce = new ExpressBruteFlexible(
+  ExpressBruteFlexible.LIMITER_TYPES.REDIS, 
+  opts
+);
 
 routes.post('/patient/login', bruteforce.prevent ,PatientValidator.login, AuthController.loginPatient);
 routes.post('/secretary/login', bruteforce.prevent,SecretaryController.login);
