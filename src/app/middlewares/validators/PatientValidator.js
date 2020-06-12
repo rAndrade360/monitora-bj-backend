@@ -2,6 +2,8 @@ const { check } = require('express-validator');
 const Patient = require('../../models/Patient');
 const cpf_validator = require('cpf-cnpj-validator');
 const generateHashedPassword = require('../../utils/generateHashedPassword');
+const DailyReportValidator = require('./DailyReportValidator');
+const TestDataValidator = require('./TestDataValidator');
 
 const common = [
     check('patient.name')
@@ -11,14 +13,57 @@ const common = [
         .trim()
         .escape(),
 
-    check('patient.phone_number')
+    check('patient.monther_name')
         .notEmpty()
+        .isLength({ min: 5 })
+        .withMessage('Invalid monther name')
+        .trim()
+        .escape(),
+
+    check('patient.has_cpf')
+        .optional()
+        .isBoolean(),
+
+    check('patient.is_foreign')
+        .optional()
+        .isBoolean(),
+
+    check('patient.cbo')
+        .optional()
+        .trim()
+        .escape(),
+
+    check('patient.cns')
+        .optional()
+        .trim()
+        .escape(),
+
+    check('patient.healthcare_professional')
+        .optional()
+        .isBoolean(),
+
+    check('patient.phone_number')
+        .optional()
         .isMobilePhone('pt-BR'),
+
+    check('patient.whatsapp')
+        .optional()
+        .isMobilePhone('pt-BR'),
+
+    check('patient.origin_country')
+        .optional()
+        .trim()
+        .escape(),
+
+    check('patient.passport')
+        .optional()
+        .trim()
+        .escape(),
 
     check('patient.genre')
         .notEmpty()
         .trim()
-        .isIn(['male', 'female']),
+        .isIn(['masculino', 'feminino']),
 
     check('address.address')
         .notEmpty()
@@ -45,22 +90,6 @@ const common = [
         .notEmpty()
         .toDate(),    
 
-    check('patient.risk')
-        .notEmpty()
-        .isIn(['low', 'medium', 'high', 'critic']),
-
-    check('patient.status')
-        .notEmpty()
-        .isIn([
-            'suspect',
-            'monitored',
-            'infected',
-            'discarded_by_isolation',
-            'discarded_by_test',
-            'cured',
-            'death'
-        ]),
-
     check('address.address')
         .notEmpty()
         .escape()
@@ -71,6 +100,8 @@ const common = [
 
 const store = [
     ...common,
+    ...DailyReportValidator,
+    ...TestDataValidator,
 
     check('patient.cpf')
         .notEmpty()
@@ -80,16 +111,10 @@ const store = [
         .custom(async (cpf) => {
             const existsPatient = await Patient.verifyIfAlreadExists(cpf);
             const valid = cpf_validator.cpf.isValid(cpf);
-            if (existsPatient) throw new Error('Patient already exists')
-            return valid;
+            if (existsPatient){ throw new Error('Patient already exists')};
+            if(!valid) {throw new Error('Invalid cpf')}
         }),
 
-    check('patient.password')
-        .notEmpty()
-        .isLength({ min: 8 })
-        .customSanitizer(password => {
-            return generateHashedPassword(password)
-        }),
 
 	check('fixed_report.recent_travel')
         .notEmpty()
@@ -104,9 +129,32 @@ const store = [
         .notEmpty()
         .isBoolean(),
 
-    check('patient.screening_day')
+    check('fixed_report.screening_day')
         .notEmpty()
         .toDate(),
+
+    check('fixed_report.symptom_onset_date')
+        .notEmpty()
+        .toDate(),
+
+    check('fixed_report.risk')
+        .notEmpty()
+        .isIn(['baixo', 'medio', 'alto', 'critico']),
+
+    check('fixed_report.status')
+        .notEmpty()
+        .isIn([
+            'suspeito',
+            'internado',
+            'descartado_por_isolamento',
+            'descartado_por_teste',
+            'curado',
+            'obito',
+            'em_tratamento_domiciliar',
+            'internado_em_uti',
+            'ignorado',
+            'cancelado'
+        ]),
 ]
 
 const update = common
@@ -121,11 +169,9 @@ const login = [
             return valid;
         }),
 
-    check('password')
+    check('birthday')
         .notEmpty()
-        .isLength({ min: 8 })
-        .escape()
-        .trim()
+        .toDate(),
 ]
 
 module.exports = {

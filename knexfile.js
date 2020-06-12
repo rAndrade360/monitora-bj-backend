@@ -16,7 +16,7 @@ module.exports = {
       directory: path.resolve(__dirname, 'src', 'database', 'seeds')
     }
   },
-
+  
   staging: {
     client: process.env.DBCLIENT,
     connection: {

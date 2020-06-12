@@ -5,9 +5,11 @@ exports.up = function (knex) {
         table.integer('patient_id')
             .unsigned()
             .notNullable()
-            .references('patients.id')
+            .references('id')
+            .inTable('patients')
             .onDelete('CASCADE')
             .onUpdate('CASCADE');
+        table.string('cep').notNullable();
         table.string('address').notNullable();
         table.string('street').notNullable();
         table.integer('number').notNullable();

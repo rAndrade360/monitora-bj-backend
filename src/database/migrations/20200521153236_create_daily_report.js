@@ -5,7 +5,8 @@ exports.up = function (knex) {
         table.integer('patient_id')
             .unsigned()
             .notNullable()
-            .references('patients.id')
+            .references('id')
+            .inTable('patients')
             .onDelete('CASCADE')
             .onUpdate('CASCADE');
 	table.boolean('fever').notNullable().defaultTo(false);
@@ -32,7 +33,7 @@ exports.up = function (knex) {
         table.boolean('inappetence').notNullable().defaultTo(false);
         table.boolean('loss_of_taste').notNullable().defaultTo(false);
         table.boolean('loss_of_smell').notNullable().defaultTo(false);
-	table.boolean('readed').defaultTo(false);
+	    table.boolean('readed').defaultTo(false);
         table.string('others');
         table.timestamp("created_at").notNullable().defaultTo(knex.fn.now());
         table.timestamp("updated_at").notNullable().defaultTo(knex.fn.now());

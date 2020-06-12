@@ -2,13 +2,24 @@ const PatientModel = require('../models/Patient');
 const { validationResult } = require('express-validator');
 module.exports = {
     async create(req, res) {
-        if (req.userPermission !== 'secretary') return res.status(401).json({ error: 'Not authorized' })
-        const { patient, address, fixed_report } = req.body;
+        if (req.userPermission !== 'secretary') return res
+            .status(401)
+            .json({ error: 'Not authorized' });
+        const {
+            patient,
+            address,
+            fixed_report,
+            daily_report,
+            test_data,
+            conditions
+        } = req.body;
         const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() })
+        if (!errors.isEmpty()) return res
+            .status(400)
+            .json({ errors: errors.array() })
         let patientId;
-        try {
-            patientId = await PatientModel.store(patient, address, fixed_report);
+        try {      
+            patientId = await PatientModel.store(patient, address, fixed_report, daily_report, test_data, conditions);
         } catch (err) {
             return res.status(500).json({ error: 'Can not store in database' });
         }

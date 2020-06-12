@@ -12,29 +12,22 @@ const DailyReport = () => {
         return dailyReportId
     }
 
-    // const formatDate = (date_report) => {
-    //     const day = getDay(date_report);
-    //     const month = getMonth(date_report);
-    //     const year = getYear(date_report);
-    //     const date = new Date(year, month, day);
-    //     const nextDate = addDays(date, 1);
-    //     return { date, nextDate }
-    // }
     const listByDateAndPatient = async (patient_id, date_report, report_id) => {
         let daily_reports
         try {
             let query = connection('daily_reports')
                 .where({readed: false})
 								.join('patients', 'patients.id', '=', 'daily_reports.patient_id')
+								.join('fixed_reports', 'fixed_reports.patient_id', '=', 'daily_reports.patient_id')
 								.select(
 											'patients.name',
 											'patients.cpf',
 											'patients.birthday',
-											'patients.screening_day',
-											'patients.risk',
-											'patients.status',
 											'patients.genre',
 											'patients.phone_number',
+											'fixed_reports.screening_day',
+											'fixed_reports.risk',
+											'fixed_reports.status',
 											'daily_reports.id',
 											'daily_reports.patient_id',	
 											'daily_reports.fever',
@@ -65,10 +58,10 @@ const DailyReport = () => {
 											'daily_reports.created_at',
 									)
             if (patient_id) {
-              query.andWhere('patient_id', patient_id)            
+              query.where('daily_reports.patient_id', patient_id)            
             }
 						if (report_id) {
-						  query.andWhere('daily_reports.id', report_id)
+						  query.where('daily_reports.id', report_id)
 						}
             daily_reports = await query;
         } catch (error) {
@@ -77,11 +70,12 @@ const DailyReport = () => {
         return daily_reports;
 		}
 		
-		const updateStatusAndRisk = async (daily_report_id) => {
+		const update = async (daily_report_id) => {
 			let dailyReportId
 			try {
 					dailyReportId = await connection('daily_reports').update({
-						readed: true
+						readed: true,
+						updated_at: connection.fn.now()
 					}).where({id: daily_report_id})
 			} catch (error) {
 					throw error
@@ -92,7 +86,7 @@ const DailyReport = () => {
     return {
         store,
 				listByDateAndPatient,
-				updateStatusAndRisk
+				update
     }
 }
 

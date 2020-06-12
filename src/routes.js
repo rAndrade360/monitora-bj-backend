@@ -8,17 +8,27 @@ const SecretaryController = require('./app/controllers/SecretaryController');
 const DashboardController = require('./app/controllers/DashboardController');
 const DailyReportController = require('./app/controllers/DailyReportController');
 const PatientStatusController = require('./app/controllers/PatientStatusController');
+const TestDataController = require('./app/controllers/TestDataController');
 
 const PatientValidator = require('./app/middlewares/validators/PatientValidator');
 const PatientUpdateValidator = require('./app/middlewares/validators/PatientUpdateValidator');
 const DailyReportValidator = require('./app/middlewares/validators/DailyReportValidator');
+const TestDataValidator = require('./app/middlewares/validators/TestDataValidator');
 const tokenValidator = require('./app/middlewares/auth/tokenValidator');
 
-const store = redis.createClient({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-  password: process.env.REDIS_PASSWORD
-});
+let store;
+if(process.env.NODE_ENV === 'production'){
+  store = redis.createClient({
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASSWORD
+  });
+}else{
+  store = redis.createClient({
+    host: 'localhost',
+    port: 6379,
+  });
+}
 
 const opts = {
   freeRetries: 5,
@@ -33,7 +43,7 @@ const bruteforce = new ExpressBruteFlexible(
   opts
 );
 
-routes.post('/patient/login', bruteforce.prevent ,PatientValidator.login, AuthController.loginPatient);
+routes.post('/patient/login', bruteforce.prevent, PatientValidator.login, AuthController.loginPatient);
 routes.post('/secretary/login', bruteforce.prevent,SecretaryController.login);
 routes.get('/patients/dashboard', bruteforce.prevent, DashboardController.showDataOfAllPatients);
 
@@ -51,5 +61,8 @@ routes.delete('/patient/:id/delete', PatientController.delete);
 routes.post('/patient/dailyreport', DailyReportValidator, DailyReportController.create);
 routes.get('/patient/dailyreport', DailyReportController.list);
 routes.post('/patient/dailyreport/:reportId/readed', DailyReportController.update);
+
+routes.put('/patient/:patientId/test/:testId', TestDataValidator, TestDataController.update);
+routes.get('/patient/test', TestDataController.index);
 
 module.exports = routes;

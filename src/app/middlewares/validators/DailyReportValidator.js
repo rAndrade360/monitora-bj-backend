@@ -1,102 +1,102 @@
 const { check } = require('express-validator');
 module.exports = [
-    check('fever')
+    check('daily_report.fever')
         .notEmpty()
         .isBoolean(),
 
-    check('cough')
+    check('daily_report.cough')
         .notEmpty()
         .isBoolean(),
 
-    check('difficulty_breathing')
+    check('daily_report.difficulty_breathing')
         .notEmpty()
         .isBoolean(),
 
-    check('sputum_production')
+    check('daily_report.sputum_production')
         .notEmpty()
         .isBoolean(),
 
-    check('nasal_congestion')
+    check('daily_report.nasal_congestion')
         .notEmpty()
         .isBoolean(),
 
-    check('difficulty_swallowing')
+    check('daily_report.difficulty_swallowing')
         .notEmpty()
         .isBoolean(),
 
-    check('sore_throat')
+    check('daily_report.sore_throat')
         .notEmpty()
         .isBoolean(),
 
-    check('coryza')
+    check('daily_report.coryza')
         .notEmpty()
         .isBoolean(),
 
-    check('signs_of_cyanosis')
+    check('daily_report.signs_of_cyanosis')
         .notEmpty()
         .isBoolean(),
 
-    check('drawing')
+    check('daily_report.drawing')
         .notEmpty()
         .isBoolean(),
 
-    check('intercostal')
+    check('daily_report.intercostal')
         .notEmpty()
         .isBoolean(),
 
-    check('fatigue')
+    check('daily_report.fatigue')
         .notEmpty()
         .isBoolean(),
 
-    check('myalgia_or_arthralgia')
+    check('daily_report.myalgia_or_arthralgia')
         .notEmpty()
         .isBoolean(),
 
-    check('headache')
+    check('daily_report.headache')
         .notEmpty()
         .isBoolean(),
 
-    check('chill')
+    check('daily_report.chill')
         .notEmpty()
         .isBoolean(),
 
-    check('red_spots_on_the_body')
+    check('daily_report.red_spots_on_the_body')
         .notEmpty()
         .isBoolean(),
 
-    check('enlarged_lymph_nodes')
+    check('daily_report.enlarged_lymph_nodes')
         .notEmpty()
         .isBoolean(),
 
-    check('diarrhea')
+    check('daily_report.diarrhea')
         .notEmpty()
         .isBoolean(),
 
-    check('nausea')
+    check('daily_report.nausea')
         .notEmpty()
         .isBoolean(),
 
-    check('vomiting')
+    check('daily_report.vomiting')
         .notEmpty()
         .isBoolean(),
 
-    check('dehydration')
+    check('daily_report.dehydration')
         .notEmpty()
         .isBoolean(),
 
-    check('inappetence')
+    check('daily_report.inappetence')
         .notEmpty()
         .isBoolean(),
 
-    check('loss_of_taste')
+    check('daily_report.loss_of_taste')
         .notEmpty()
         .isBoolean(),
 
-    check('loss_of_smell')
+    check('daily_report.loss_of_smell')
         .notEmpty()
         .isBoolean(),
 
-    check('others')
+    check('daily_report.others')
         .optional()
         .trim()
         .escape(),

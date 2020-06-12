@@ -1,33 +1,52 @@
 const PatientModel = require('../models/Patient');
+const { isToday, toDate, parseISO } = require('date-fns');
 
 function getRiskAndStatus(patients){
   const data = {
     risks: {
-      low: 0,
-      medium: 0,
-      high: 0,
-      critic: 0
+      baixo: 0,
+      medio: 0,
+      alto: 0,
+      critico: 0
     },
     status: {
-      suspect: 0,
-      monitored: 0,
-      infected: 0,
-      discarded_by_isolation: 0,
-      discarded_by_test: 0,
-      cured: 0,
-      death: 0,
+      suspeito: 0,
+      internado: 0,
+      infectado: 0,
+      descartado_por_isolamento: 0,
+      descartado_por_teste: 0,
+      curado: 0,
+      obito: 0,
+      em_tratamento_domiciliar: 0,
+      internado_em_uti: 0,
+      ignorado: 0,
+      cancelado: 0
     },
     genre: {
-      male: 0,
-      female: 0
+      masculino: 0,
+      feminino: 0
     },
-    address: []
+    today: {
+      status: {
+        suspeito: 0,
+        internado: 0,
+        infectado: 0,
+        descartado_por_isolamento: 0,
+        descartado_por_teste: 0,
+        curado: 0,
+        obito: 0,
+        em_tratamento_domiciliar: 0,
+        internado_em_uti: 0,
+        ignorado: 0,
+        cancelado: 0
+      },
+    }
   }
   patients.map(patient => {
     data.status[patient.status]++;
     data.genre[patient.genre]++;
     data.risks[patient.risk]++;
-    data.address[patient.address] = data.address[patient.address] ? data.address[patient.address]++ :  1;
+    data.today.status[patient.status] += isToday(Date.parse(patient.test_update)) ? 1 : 0;
   })
   return data;
 }
