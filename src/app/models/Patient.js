@@ -31,13 +31,13 @@ const Patient = () => {
         })
         .returning('id')
         .transacting(trx);
-      console.log('patientid', patientId);
       address.patient_id = patientId[0];
       await connection('addresses').insert(address).transacting(trx);
       daily_report.patient_id = patientId[0];
       daily_report.readed = true;
       const dailyReportId = await connection('daily_reports')
         .insert(daily_report)
+        .returning('id')
         .transacting(trx);
       fixed_report.patient_id = patientId[0];
       fixed_report.symptoms_id = dailyReportId[0];
