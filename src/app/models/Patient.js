@@ -29,6 +29,7 @@ const Patient = () => {
           healthcare_professional: patient.healthcare_professional,
           origin_country: patient.origin,
         })
+        .returning('id')
         .transacting(trx);
       console.log('patientid', patientId);
       address.patient_id = patientId[0];
