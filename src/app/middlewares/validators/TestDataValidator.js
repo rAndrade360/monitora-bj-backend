@@ -13,9 +13,7 @@ module.exports = [
     .notEmpty()
     .isIn(['teste_rapido_anticorpo', 'teste_rapido_antigeno', 'rt_pcr']),
 
-  check('test_data.test_result')
-    .isBoolean()
-    .optional(),
+  check('test_data.test_result').isBoolean().optional(),
 
   check('test_data.final_classification')
     .optional()
@@ -25,17 +23,10 @@ module.exports = [
       'nao_definido',
       'confirmacao_laboratorial',
       'confirmacao_clinico_epidemiologico',
-      'descartado']
-    ),
+      'descartado',
+    ]),
 
-  check('test_data.collection_date')
-      .toDate()
-      .optional(),
+  check('test_data.collection_date').toDate().optional(),
 
-  check('test_data.closing_date')
-      .toDate()
-      .optional()
-
-
-  
-]
+  check('test_data.closing_date').toDate().optional(),
+];

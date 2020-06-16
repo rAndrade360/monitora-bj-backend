@@ -1,18 +1,28 @@
-const PatientModel = require('../models/Patient');
 const { validationResult } = require('express-validator');
+const PatientModel = require('../models/Patient');
+
 module.exports = {
-  async update(req, res){
-    if (req.userPermission !== 'secretary') return res.status(401).json({ error: 'Not authorized' })
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() })
-    const {status, risk} = req.body;
+  async update(req, res) {
+    if (
+      req.userPermission !== 'secretary' &&
+      req.userPermission !== 'basic_unity'
+    )
+      return res.status(401).json({ error: 'Not authorized' });
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+    const { status, risk } = req.body;
     const { patientId } = req.params;
-    let updatedPatient
+    let updatedPatient;
     try {
-      updatedPatient = await PatientModel.updateStatusAndRisk(patientId, status, risk);
+      updatedPatient = await PatientModel.updateStatusAndRisk(
+        patientId,
+        status,
+        risk
+      );
     } catch (error) {
-      return res.status(500).json({ error: 'Can not update data' })
+      return res.status(500).json({ error: 'Can not update data' });
     }
     return res.json(updatedPatient);
-  }
-}
+  },
+};

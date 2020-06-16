@@ -2,6 +2,13 @@
 exports.up = function (knex) {
     return knex.schema.createTable('patients', function (table) {
         table.increments('id').primary();
+        table.integer('strategy_id')
+            .unsigned()
+            .notNullable()
+            .references('id')
+            .inTable('strategies')
+            .onDelete('CASCADE')
+            .onUpdate('CASCADE');
         table.string('name').notNullable();
         table.string('monther_name').notNullable();
         table.boolean('has_cpf').defaultTo(true);
