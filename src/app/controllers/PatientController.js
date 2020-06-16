@@ -34,6 +34,7 @@ module.exports = {
         conditions
       );
     } catch (err) {
+      console.log(err);
       return res.status(500).json({ error: 'Can not store in database' });
     }
     return res.json(patientId);
@@ -46,10 +47,13 @@ module.exports = {
     const { strategy_id } = req.headers;
     let patient;
     const patientStore = {
-        page,
-        name,
-        strategy_id: req.userPermission ==='test_center'? undefined : parseInt(strategy_id),
-      }
+      page,
+      name,
+      strategy_id:
+        req.userPermission === 'test_center'
+          ? undefined
+          : parseInt(strategy_id),
+    };
     try {
       patient = await PatientModel.listAll(patientStore);
     } catch (err) {
