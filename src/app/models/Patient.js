@@ -30,6 +30,7 @@ const Patient = () => {
           origin_country: patient.origin,
         })
         .transacting(trx);
+      console.log('patientid', patientId);
       address.patient_id = patientId[0];
       await connection('addresses').insert(address).transacting(trx);
       daily_report.patient_id = patientId[0];
