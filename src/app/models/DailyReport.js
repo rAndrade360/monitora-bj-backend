@@ -16,7 +16,7 @@ const DailyReport = () => {
         let daily_reports
         try {
             let query = connection('daily_reports')
-                .where({readed: false})
+                .where({readed: true})
 								.join('patients', 'patients.id', '=', 'daily_reports.patient_id')
 								.join('fixed_reports', 'fixed_reports.patient_id', '=', 'daily_reports.patient_id')
 								.select(

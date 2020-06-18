@@ -127,6 +127,7 @@ const Patient = () => {
         'addresses.street',
         'addresses.number',
         'addresses.complement',
+        'fixed_reports.symptoms_id',
         'fixed_reports.id as fixed_report_id',
         'fixed_reports.recent_travel',
         'fixed_reports.traveled_to_city',

@@ -1,7 +1,6 @@
 const { check } = require('express-validator');
 const cpf_validator = require('cpf-cnpj-validator');
 const Patient = require('../../models/Patient');
-const generateHashedPassword = require('../../utils/generateHashedPassword');
 const DailyReportValidator = require('./DailyReportValidator');
 const TestDataValidator = require('./TestDataValidator');
 
