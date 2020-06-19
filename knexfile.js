@@ -1,36 +1,44 @@
 // Update with your config settings.
 const path = require('path');
+require('dotenv').config();
 
 module.exports = {
-
   development: {
-    client: 'sqlite3',
-    connection: {
-      filename: path.resolve(__dirname, 'src', 'database', 'dev.sqlite')
-    },
-    useNullAsDefault: true,
-    migrations: {
-      directory: path.resolve(__dirname, 'src', 'database', 'migrations')
-    },
-    seeds: {
-      directory: path.resolve(__dirname, 'src', 'database', 'seeds')
-    }
-  },
-  
-  staging: {
     client: process.env.DBCLIENT,
     connection: {
-      database:  process.env.DATABASE,
+      host: process.env.DBHOST,
+      port: process.env.DBPORT,
+      database: process.env.DATABASE,
       user: process.env.DBUSERNAME,
-      password: process.env.DBPASSWORD
+      password: process.env.DBPASSWORD,
     },
     pool: {
       min: 2,
-      max: 10
+      max: 10,
     },
     migrations: {
-      tableName: 'knex_migrations'
-    }
+      tableName: 'knex_migrations',
+      directory: path.resolve(__dirname, 'src', 'database', 'migrations'),
+    },
+    seeds: {
+      directory: path.resolve(__dirname, 'src', 'database', 'seeds'),
+    },
+  },
+
+  staging: {
+    client: process.env.DBCLIENT,
+    connection: {
+      database: process.env.DATABASE,
+      user: process.env.DBUSERNAME,
+      password: process.env.DBPASSWORD,
+    },
+    pool: {
+      min: 2,
+      max: 10,
+    },
+    migrations: {
+      tableName: 'knex_migrations',
+    },
   },
 
   production: {
@@ -38,21 +46,20 @@ module.exports = {
     connection: {
       host: process.env.DBHOST,
       port: process.env.DBPORT,
-      database:  process.env.DATABASE,
+      database: process.env.DATABASE,
       user: process.env.DBUSERNAME,
-      password: process.env.DBPASSWORD
+      password: process.env.DBPASSWORD,
     },
     pool: {
       min: 2,
-      max: 10
+      max: 10,
     },
     migrations: {
       tableName: 'knex_migrations',
-      directory: path.resolve(__dirname, 'src', 'database', 'migrations')
+      directory: path.resolve(__dirname, 'src', 'database', 'migrations'),
     },
     seeds: {
-      directory: path.resolve(__dirname, 'src', 'database', 'seeds')
-    }
-  }
-
+      directory: path.resolve(__dirname, 'src', 'database', 'seeds'),
+    },
+  },
 };

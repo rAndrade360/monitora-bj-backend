@@ -13,7 +13,7 @@ const common = [
     .escape(),
 
   check('patient.monther_name')
-    .notEmpty()
+    .optional()
     .isLength({ min: 5 })
     .withMessage('Invalid monther name')
     .trim()
@@ -39,17 +39,15 @@ const common = [
 
   check('patient.genre').notEmpty().trim().isIn(['masculino', 'feminino']),
 
-  check('address.address').notEmpty().escape().trim().isLength({ min: 3 }),
+  check('address.address').optional().escape().trim().isLength({ min: 3 }),
 
-  check('address.street').notEmpty().escape().trim().isLength({ min: 3 }),
+  check('address.street').optional().escape().trim().isLength({ min: 3 }),
 
-  check('address.number').notEmpty().isNumeric(),
+  check('address.number').optional().isNumeric(),
 
   check('address.complement').optional().escape().trim(),
 
   check('patient.birthday').notEmpty().toDate(),
-
-  check('address.address').notEmpty().escape().trim().isLength({ min: 3 }),
 ];
 
 const store = [
@@ -58,7 +56,7 @@ const store = [
   ...TestDataValidator,
 
   check('patient.cpf')
-    .notEmpty()
+    .optional()
     .isNumeric()
     .isLength({ min: 8 })
     .withMessage('Invalid cpf')
