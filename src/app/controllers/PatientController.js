@@ -34,7 +34,6 @@ module.exports = {
         conditions
       );
     } catch (err) {
-      console.log(err);
       return res.status(500).json({ error: 'Can not store in database' });
     }
     return res.json(patientId);
@@ -43,12 +42,14 @@ module.exports = {
   async index(req, res) {
     if (req.userPermission === 'patient')
       return res.status(401).json({ error: 'Not authorized' });
-    const { page = 1, name = '' } = req.query;
+    const { page, name = '', date, status } = req.query;
     const { strategy_id } = req.headers;
     let patient;
     const patientStore = {
       page,
       name,
+      date,
+      status,
       strategy_id:
         req.userPermission === 'test_center'
           ? undefined
@@ -60,8 +61,9 @@ module.exports = {
       return res.status(500).json({ error: 'Can not load patients' });
     }
     const { count } = patient;
+    res.header('X-Total-Count', count[0].count);
     patient.count = undefined;
-    return res.json({ patient, count });
+    return res.json(patient);
   },
 
   async show(req, res) {
@@ -87,16 +89,16 @@ module.exports = {
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
     const { id } = req.params;
-    const { patient, address } = req.body;
+    const { patient, address, fixed_report } = req.body;
     const { strategy_id } = req.headers;
-    const updateId = parseInt(id);
+    patient.id = parseInt(id);
     let patientId;
     try {
       patientId = await PatientModel.update(
         patient,
         address,
-        updateId,
-        strategy_id
+        strategy_id,
+        fixed_report
       );
     } catch (error) {
       return res.status(500).json({ error: 'Can not update patient' });

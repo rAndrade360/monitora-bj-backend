@@ -45,6 +45,11 @@ const bruteforce = new ExpressBruteFlexible(
   opts
 );
 
+const allowCrossDomain = (req, res, next) => {
+  res.header('Access-Control-Expose-Headers', 'X-Total-Count');
+  next();
+}
+
 routes.post(
   '/patient/login',
   bruteforce.prevent,
@@ -71,7 +76,7 @@ routes.get(
 routes.post('/secretary/password/reset', SecretaryController.resetPassword);
 
 routes.post('/patients', PatientValidator.store, PatientController.create);
-routes.get('/patients', PatientController.index);
+routes.get('/patients', allowCrossDomain, PatientController.index);
 routes.get('/patient/:id/show', PatientController.show);
 routes.put(
   '/patient/:id/update',

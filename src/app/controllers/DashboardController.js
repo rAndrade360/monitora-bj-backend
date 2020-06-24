@@ -43,9 +43,10 @@ function getRiskAndStatus(patients, permission) {
       )
         ? 1
         : 0;
-      patient.test_result
+        patient.test_result !== null ?
+      (patient.test_result
         ? data.test_result.positivo++
-        : data.test_result.negativo++;
+        : data.test_result.negativo++): null;
       data.need_test +=
         differenceInDays(new Date(), patient.symptom_onset_date) >= 10 ? 1 : 0;
     });

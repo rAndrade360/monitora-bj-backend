@@ -2,7 +2,9 @@ const connection = require('../../database/connection');
 
 const Strategy = () => {
   const store = async (strategy) => {
-    const strategyId = await connection('strategies').insert(strategy);
+    const strategyId = await connection('strategies')
+      .insert(strategy)
+      .returning('id');
 
     return strategyId;
   };

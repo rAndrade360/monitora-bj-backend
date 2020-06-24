@@ -18,7 +18,7 @@ const reset = [
     .notEmpty()
     .isLength({ min: 8 })
     .customSanitizer((password) => {
-      return generateHashedPassword(password, bcrypt);
+      return generateHashedPassword(password);
     }),
 
   check('oldPassword').notEmpty().isLength({ min: 8 }).trim().escape(),

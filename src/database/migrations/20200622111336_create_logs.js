@@ -1,6 +1,6 @@
 exports.up = function (knex) {
-  return knex.schema.createTable('patient_conditions', function (table) {
-    table.increments('id').primary();
+  return knex.schema.createTable('patient_logs', (table) => {
+    table.increments('id');
     table
       .integer('patient_id')
       .unsigned()
@@ -10,18 +10,19 @@ exports.up = function (knex) {
       .onDelete('CASCADE')
       .onUpdate('CASCADE');
     table
-      .integer('condition_id')
+      .integer('strategy_id')
       .unsigned()
-      .notNullable()
       .references('id')
-      .inTable('conditions')
+      .inTable('strategies')
       .onDelete('CASCADE')
       .onUpdate('CASCADE');
+    table.string('field_name').notNullable();
+    table.string('old_value');
+    table.string('new_value');
     table.timestamp('created_at').notNullable().defaultTo(knex.fn.now());
-    table.timestamp('updated_at').notNullable().defaultTo(knex.fn.now());
   });
 };
 
 exports.down = function (knex) {
-  return knex.schema.dropTable('patient_conditions');
+  return knex.schema.dropTable('patient_logs');
 };

@@ -13,7 +13,7 @@ module.exports = [
     .notEmpty()
     .isIn(['teste_rapido_anticorpo', 'teste_rapido_antigeno', 'rt_pcr']),
 
-  check('test_data.test_result').isBoolean().optional(),
+  check('test_data.test_result').isBoolean().optional({ nullable: true }),
 
   check('test_data.final_classification')
     .optional()

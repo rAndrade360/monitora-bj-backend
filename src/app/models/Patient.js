@@ -1,3 +1,4 @@
+const { addDays } = require('date-fns');
 const connection = require('../../database/connection');
 
 const Patient = () => {
@@ -31,31 +32,32 @@ const Patient = () => {
         })
         .returning('id')
         .transacting(trx);
-      address.patient_id = patientId[0];
+      const [id] = patientId;
+      address.patient_id = id;
       await connection('addresses').insert(address).transacting(trx);
-      daily_report.patient_id = patientId[0];
+      daily_report.patient_id = id;
       daily_report.readed = true;
       const dailyReportId = await connection('daily_reports')
         .insert(daily_report)
         .returning('id')
         .transacting(trx);
-      fixed_report.patient_id = patientId[0];
+      fixed_report.patient_id = id;
       fixed_report.symptoms_id = dailyReportId[0];
       await connection('fixed_reports').insert(fixed_report).transacting(trx);
       const patientConditions = conditions.map((condition) => ({
         condition_id: condition,
-        patient_id: patientId[0],
+        patient_id: id,
       }));
       await connection('patient_conditions')
         .insert(patientConditions)
         .transacting(trx);
-      test_data.patient_id = patientId[0];
+      test_data.patient_id = id;
       await connection('test_data').insert(test_data).transacting(trx);
     });
     return patientId;
   };
 
-  const listAll = async ({ page = 1, name, date, strategy_id }) => {
+  const listAll = async ({ page, name, date, strategy_id, status }) => {
     const countQuery = connection('patients').count();
     const query = connection('patients')
       .join('addresses', 'patients.id', '=', 'addresses.patient_id')
@@ -64,11 +66,20 @@ const Patient = () => {
       .select(
         'patients.id',
         'patients.name',
+        'patients.monther_name',
         'patients.cpf',
         'patients.cbo',
+        'patients.cns',
         'patients.phone_number',
+        'patients.whatsapp',
+        'patients.is_foreign',
+        'patients.healthcare_professional',
         'patients.genre',
         'patients.birthday',
+        'patients.passport',
+        'patients.origin_country',
+        'patients.created_at as creation_date',
+        'patients.updated_at as update_date',
         'addresses.address',
         'addresses.street',
         'addresses.number',
@@ -90,18 +101,25 @@ const Patient = () => {
         'test_data.closing_date',
         'test_data.created_at as test_creation',
         'test_data.updated_at as test_update'
-      )
-      .limit(20)
-      .offset((page - 1) * 20);
+      );
+    if (page) {
+      query.limit(20).offset((page - 1) * 20);
+    }
     if (name) {
-      query.andWhere('name', 'like', `%${name}%`);
+      query.andWhere('patients.name', 'like', `%${name}%`);
+      countQuery.andWhere('patients.name', 'like', `%${name}%`);
+    }
+    if (status) {
+      query.where('fixed_reports.status', status);
     }
     if (strategy_id) {
-      query.where('strategy_id', strategy_id);
-      countQuery.where('strategy_id', strategy_id);
+      query.where('patients.strategy_id', strategy_id);
+      countQuery.where('patients.strategy_id', strategy_id);
     }
     if (date) {
-      query.where('created_at', new Date());
+      const afterDate = addDays(new Date(date), 1);
+      query.whereBetween('patients.created_at', [date, afterDate]);
+      countQuery.whereBetween('patients.created_at', [date, afterDate]);
     }
     const patients = await query;
     const count = await countQuery;
@@ -120,15 +138,24 @@ const Patient = () => {
         'patients.monther_name',
         'patients.cpf',
         'patients.cbo',
+        'patients.cns',
         'patients.phone_number',
+        'patients.whatsapp',
+        'patients.is_foreign',
+        'patients.healthcare_professional',
         'patients.genre',
         'patients.birthday',
+        'patients.passport',
+        'patients.origin_country',
+        'patients.created_at as creation_date',
+        'patients.updated_at as update_date',
         'addresses.address',
         'addresses.street',
         'addresses.number',
         'addresses.complement',
-        'fixed_reports.symptoms_id',
+        'addresses.cep',
         'fixed_reports.id as fixed_report_id',
+        'fixed_reports.symptoms_id',
         'fixed_reports.recent_travel',
         'fixed_reports.traveled_to_city',
         'fixed_reports.recent_contact',
@@ -136,6 +163,14 @@ const Patient = () => {
         'fixed_reports.symptom_onset_date',
         'fixed_reports.risk',
         'fixed_reports.status',
+        'fixed_reports.blood_glucose',
+        'fixed_reports.blood_pressure',
+        'fixed_reports.temperature',
+        'fixed_reports.heart_rate',
+        'fixed_reports.oxygen_saturation',
+        'fixed_reports.household_contacts',
+        'fixed_reports.professional_name',
+        'fixed_reports.additional_notes',
         'test_data.id as test_id',
         'test_data.test_status',
         'test_data.test_type',
@@ -187,36 +222,35 @@ const Patient = () => {
     });
   };
 
-  const update = async (patient, address, id, strategy_id) => {
+  const update = async (patient, address, strategy_id, fixedReport) => {
     let patientId;
     await connection.transaction(async (trx) => {
       patientId = await connection('patients')
-        .where('id', id)
+        .where('id', patient.id)
         .update(
           {
             name: patient.name,
+            monther_name: patient.monther_name,
+            cpf: patient.cpf,
+            cbo: patient.cbo,
+            cns: patient.cns,
             phone_number: patient.phone_number,
+            whatsapp: patient.whatsapp,
+            passport: patient.passport,
             genre: patient.genre,
-            birthday: new Date(patient.birthday),
+            birthday: patient.birthday,
             updated_at: connection.fn.now(),
           },
           ['id']
         )
-        .where('strategy_id', strategy_id)
         .transacting(trx);
       await connection('addresses')
-        .update(address, ['id'])
-        .where('patient_id', id)
+        .update({ ...address, updated_at: connection.fn.now() }, ['id'])
+        .where('patient_id', patient.id)
         .transacting(trx);
       await connection('fixed_reports')
-        .update(
-          {
-            status: patient.status,
-            risk: patient.risk,
-          },
-          ['id']
-        )
-        .where('patient_id', id)
+        .update({ ...fixedReport, updated_at: connection.fn.now() }, ['id'])
+        .where('patient_id', patient.id)
         .transacting(trx);
     });
     return patientId;
@@ -224,7 +258,7 @@ const Patient = () => {
 
   const updateStatusAndRisk = async (patient_id, status, risk) => {
     const patientId = await connection('fixed_reports')
-      .where('pateint_id', patient_id)
+      .where('patient_id', patient_id)
       .update(
         {
           risk,
