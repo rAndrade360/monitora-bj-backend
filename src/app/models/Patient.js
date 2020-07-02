@@ -1,15 +1,15 @@
 const { addDays } = require('date-fns');
 const connection = require('../../database/connection');
 
-const Patient = () => {
-  const store = async (
+class Patient {
+  async store(
     patient,
     address,
     fixed_report,
     daily_report,
     test_data,
     conditions
-  ) => {
+  ) {
     let patientId;
     await connection.transaction(async (trx) => {
       patientId = await connection('patients')
@@ -55,14 +55,15 @@ const Patient = () => {
       await connection('test_data').insert(test_data).transacting(trx);
     });
     return patientId;
-  };
+  }
 
-  const listAll = async ({ page, name, date, strategy_id, status }) => {
+  async listAll({ page, name, date, strategy_id, status }) {
     const countQuery = connection('patients').count();
     const query = connection('patients')
       .join('addresses', 'patients.id', '=', 'addresses.patient_id')
       .join('fixed_reports', 'patients.id', '=', 'fixed_reports.patient_id')
       .join('test_data', 'patients.id', '=', 'test_data.patient_id')
+      .leftJoin('districts', 'districts.id', '=', 'addresses.district_id')
       .select(
         'patients.id',
         'patients.name',
@@ -76,14 +77,12 @@ const Patient = () => {
         'patients.healthcare_professional',
         'patients.genre',
         'patients.birthday',
+        'districts.name as address',
+        'districts.zone as zone',
         'patients.passport',
         'patients.origin_country',
         'patients.created_at as creation_date',
         'patients.updated_at as update_date',
-        'addresses.address',
-        'addresses.street',
-        'addresses.number',
-        'addresses.complement',
         'fixed_reports.id as fixed_report_id',
         'fixed_reports.recent_travel',
         'fixed_reports.traveled_to_city',
@@ -118,20 +117,21 @@ const Patient = () => {
     }
     if (date) {
       const afterDate = addDays(new Date(date), 1);
-      query.whereBetween('patients.created_at', [date, afterDate]);
+      query.whereBetween('patients.created_at', [new Date(date), afterDate]);
       countQuery.whereBetween('patients.created_at', [date, afterDate]);
     }
     const patients = await query;
     const count = await countQuery;
     patients.count = count;
     return patients;
-  };
+  }
 
-  const list = async (id) => {
+  async list(id) {
     const patient = await connection('patients')
       .join('addresses', 'patients.id', '=', 'addresses.patient_id')
       .join('fixed_reports', 'patients.id', '=', 'fixed_reports.patient_id')
       .join('test_data', 'patients.id', '=', 'test_data.patient_id')
+      .leftJoin('districts', 'districts.id', '=', 'addresses.district_id')
       .select(
         'patients.id',
         'patients.name',
@@ -149,7 +149,8 @@ const Patient = () => {
         'patients.origin_country',
         'patients.created_at as creation_date',
         'patients.updated_at as update_date',
-        'addresses.address',
+        'districts.name as address',
+        'districts.zone as zone',
         'addresses.street',
         'addresses.number',
         'addresses.complement',
@@ -196,33 +197,33 @@ const Patient = () => {
       .select('title');
     patient.conditions = conditions;
     return patient;
-  };
+  }
 
-  const findByCpf = async (cpf) => {
+  async findByCpf(cpf) {
     const patient = await connection('patients')
       .select('id', 'name', 'cpf', 'created_at', 'birthday')
       .where('cpf', cpf)
       .limit(1)
       .first();
     return patient;
-  };
+  }
 
-  const verifyIfAlreadExists = async (cpf) => {
-    const patient = await findByCpf(cpf);
+  async verifyIfAlreadExists(cpf) {
+    const patient = await this.findByCpf(cpf);
     if (patient) return true;
     return false;
-  };
+  }
 
-  const deleteAll = async () => {
+  async deleteAll() {
     await connection.transaction(async (trx) => {
       await connection('patients').truncate().transacting(trx);
       await connection('addresses').truncate().transacting(trx);
       await connection('fixed_reports').truncate().transacting(trx);
       await connection('daily_reports').truncate().transacting(trx);
     });
-  };
+  }
 
-  const update = async (patient, address, strategy_id, fixedReport) => {
+  async update(patient, address, strategy_id, fixedReport) {
     let patientId;
     await connection.transaction(async (trx) => {
       patientId = await connection('patients')
@@ -254,9 +255,9 @@ const Patient = () => {
         .transacting(trx);
     });
     return patientId;
-  };
+  }
 
-  const updateStatusAndRisk = async (patient_id, status, risk) => {
+  async updateStatusAndRisk(patient_id, status, risk) {
     const patientId = await connection('fixed_reports')
       .where('patient_id', patient_id)
       .update(
@@ -269,9 +270,9 @@ const Patient = () => {
       );
 
     return patientId;
-  };
+  }
 
-  const deleteById = async (id) => {
+  async deleteById(id) {
     await connection.transaction(async (trx) => {
       await connection('patients').where('id', id).del().transacting(trx);
       await connection('addresses')
@@ -289,19 +290,7 @@ const Patient = () => {
     });
 
     return true;
-  };
+  }
+}
 
-  return {
-    store,
-    listAll,
-    verifyIfAlreadExists,
-    deleteById,
-    deleteAll,
-    list,
-    update,
-    findByCpf,
-    updateStatusAndRisk,
-  };
-};
-
-module.exports = Patient();
+module.exports = new Patient();

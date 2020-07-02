@@ -22,7 +22,7 @@ module.exports = {
         id: Secretary.id,
         acess_id: Secretary.acess_id,
         name: 'Secretaria Municipal de Saúde',
-        permission:'secretary'
+        permission: 'secretary',
       },
     });
   },

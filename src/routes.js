@@ -10,6 +10,8 @@ const DailyReportController = require('./app/controllers/DailyReportController')
 const PatientStatusController = require('./app/controllers/PatientStatusController');
 const TestDataController = require('./app/controllers/TestDataController');
 const StrategyController = require('./app/controllers/StrategyController');
+const DailyNewsletterController = require('./app/controllers/DailyNewsletterController');
+const DistrictController = require('./app/controllers/DistrictController');
 
 const PatientValidator = require('./app/middlewares/validators/PatientValidator');
 const PatientUpdateValidator = require('./app/middlewares/validators/PatientUpdateValidator');
@@ -48,7 +50,7 @@ const bruteforce = new ExpressBruteFlexible(
 const allowCrossDomain = (req, res, next) => {
   res.header('Access-Control-Expose-Headers', 'X-Total-Count');
   next();
-}
+};
 
 routes.post(
   '/patient/login',
@@ -104,11 +106,16 @@ routes.post(
   DailyReportController.update
 );
 
+routes.get('/patients/newsletter', DailyNewsletterController.show);
+
 routes.put(
   '/patient/:patientId/test/:testId',
   TestDataValidator,
   TestDataController.update
 );
 routes.get('/patient/test', TestDataController.index);
+
+routes.post('/districts', DistrictController.store);
+routes.get('/districts', DistrictController.index);
 
 module.exports = routes;

@@ -2,7 +2,7 @@ const { check } = require('express-validator');
 const generateHashedPassword = require('../../utils/generateHashedPassword');
 
 const login = [
-  check('acces_id').notEmpty().isLength({ min: 10 }).trim().escape(),
+  check('access_id').notEmpty().isLength({ min: 8 }).trim().escape(),
 
   check('password')
     .notEmpty()

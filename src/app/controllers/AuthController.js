@@ -35,21 +35,21 @@ module.exports = {
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
     const strategy = await StrategyModel.findByAccesId(access_id);
-    if (!strategy) next();
+    if (!strategy) return next();
     const Equal = bcrypt.compareSync(password, strategy.password);
-    if (Equal){ 
-    const token = generateToken(strategy.id, strategy.permission);
-    return res.json({
-      token,
-      type: 'Bearer',
-      user: {
-        name: strategy.name,
-        id: strategy.id,
-        access_id,
-        permission: strategy.permission
-      },
-    });
+    if (Equal) {
+      const token = generateToken(strategy.id, strategy.permission);
+      return res.json({
+        token,
+        type: 'Bearer',
+        user: {
+          name: strategy.name,
+          id: strategy.id,
+          access_id,
+          permission: strategy.permission,
+        },
+      });
     }
-    next();
+    return next();
   },
 };

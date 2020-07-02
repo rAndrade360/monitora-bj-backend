@@ -25,6 +25,7 @@
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.1",
+    "knex-hooks": "^0.0.9",
     "pg": "^8.2.1",
     "prettier": "^2.0.5",
     "rate-limit-redis": "^2.0.0",

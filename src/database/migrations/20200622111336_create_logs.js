@@ -17,6 +17,7 @@ exports.up = function (knex) {
       .onDelete('CASCADE')
       .onUpdate('CASCADE');
     table.string('field_name').notNullable();
+    table.string('table_name').notNullable();
     table.string('old_value');
     table.string('new_value');
     table.timestamp('created_at').notNullable().defaultTo(knex.fn.now());
