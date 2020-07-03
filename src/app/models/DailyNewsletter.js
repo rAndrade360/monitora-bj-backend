@@ -63,10 +63,10 @@ class DailyNewsletter {
       query.where('new_value', newValue);
     }
     if (strategy_id) {
-      query.where(strategy_id);
+      query.where('strategy_id', strategy_id);
     }
     if (patient_id) {
-      query.where(patient_id);
+      query.where('patient_id', patient_id);
     }
     const logs = await query;
     return logs;

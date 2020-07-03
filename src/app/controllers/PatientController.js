@@ -101,6 +101,7 @@ module.exports = {
         fixed_report
       );
     } catch (error) {
+      console.log(error);
       return res.status(500).json({ error: 'Can not update patient' });
     }
     return res.json(patientId);

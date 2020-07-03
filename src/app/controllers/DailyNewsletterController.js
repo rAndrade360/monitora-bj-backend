@@ -40,29 +40,33 @@ const filterData = (newsletters) => {
 
 class DailyNewsletterController {
   async show(req, res) {
-    if (req.userPermission !== 'secretary')
+    if (
+      req.userPermission !== 'secretary' &&
+      req.userPermission !== 'basic_unity'
+    )
       return res.status(401).json({ error: 'Não autorizado' });
     const {
       date,
       old_value,
       new_value,
-      strategy_id,
       patient_id,
       is_distinct,
       with_address,
     } = req.query;
+    const {strategy_id} = req.headers;
     let newsletter;
     try {
       newsletter = await DailyNewsletterModel.show({
         date,
         oldValue: old_value,
         newValue: new_value,
-        strategy_id,
         patient_id,
         is_distinct,
         with_address,
+        strategy_id: parseInt(strategy_id),
       });
     } catch (err) {
+      console.log(err);
       return res.status(500).json({ error: 'Can not load data' });
     }
     const filteredData = filterData(newsletter);
